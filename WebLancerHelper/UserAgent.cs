@@ -5,7 +5,7 @@ namespace WebLancerHelper
 {
     internal class UserAgent
     {
-        private readonly string[] userAgents = { };
+        private readonly string[] userAgents = Array.Empty<string>();
         private static UserAgent userAgent = null;
 
         public UserAgent()

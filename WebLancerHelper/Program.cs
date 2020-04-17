@@ -7,28 +7,37 @@ namespace WebLancerHelper
     {
         private static TelegramBot bot;
 
-        private static void Main(string[] args)
+        private static void Main()
         {
-            // TODO: Сделать запоминалку данных
             // TODO: Сделать работу через прокси
             // TODO: Сделать полное управление через кнопки
-            // TODO: Сделать класс для задержок, чтобы легче настраивать было
             Log.SetupConsole();
-            Console.Write("Введите логин (пример: login): ");
+            Console.Write($"Введите логин (пример: login) [если оставить пустым, будет такое значение: {Properties.Settings.Default.Login}]: ");
             string login = Console.ReadLine();
-            Console.Write("Введите пароль (пример: password): ");
+            if (login.Length == 0) login = Properties.Settings.Default.Login;
+            Properties.Settings.Default.Login = login;
+            Console.Write($"Введите пароль (пример: password) [если оставить пустым, будет такое значение: {Properties.Settings.Default.Password}]: ");
             string password = Console.ReadLine();
-            Console.Write("Введите токен телеграм бота (пример: 0000000:XXXXXXXXXXXXXXXXX): ");
+            if (password.Length == 0) password = Properties.Settings.Default.Password;
+            Properties.Settings.Default.Password = password;
+            Console.Write($"Введите токен телеграм бота (пример: 0000000:XXXXXXXXXXXXXXXXX) [если оставить пустым, будет такое значение: {Properties.Settings.Default.Token}]: ");
             string token = Console.ReadLine();
-            Console.Write("Введите свой id в телеграмме  (пример: 0000000): ");
+            if (token.Length == 0) token = Properties.Settings.Default.Token;
+            Properties.Settings.Default.Token = token;
+            Console.Write($"Введите свой id в телеграмме  (пример: 0000000) [если оставить пустым, будет такое значение: {Properties.Settings.Default.ID}]: ");
+            string idString = Console.ReadLine();
             long id = 0;
-            long.TryParse(Console.ReadLine(), out id);
-            if(id==0)
+            if (idString.Length == 0) id = Properties.Settings.Default.ID;
+            else
             {
-                Log.ExMessage("Неверный ID");
-                Console.ReadKey();
-                return;
-            }    
+                if (!long.TryParse(idString, out id))
+                {
+                    Log.ExMessage("Неверный ID");
+                    Console.ReadKey();
+                    return;
+                }
+            }
+            Properties.Settings.Default.ID = id;
             WebLancer.API api = new WebLancer.API();
             if (!api.UpdateWorkCategory())
             {
@@ -40,8 +49,12 @@ namespace WebLancerHelper
             {
                 Console.WriteLine($"{i+1}) {WebLancer.Objects.Category.Categories[i].Name}");
             }
-            Console.Write("\n\nВведите номера категорий через запятую (пример: 1,21,3) [Если оставить пустым, будет парсить все категории]: ");
-            var categoriesIndices = PrepareListCategories(Console.ReadLine());
+            Console.Write($"\n\nВведите номера категорий через запятую (пример: 1,21,3) (прошлые значения: {Properties.Settings.Default.Categories}) [Если оставить пустым, будет парсить все категории]: ");
+            var categoriesString = Console.ReadLine();
+            if (categoriesString.Length == 0) categoriesString = Properties.Settings.Default.Categories;
+            Properties.Settings.Default.Categories = categoriesString;
+            var categoriesIndices = PrepareListCategories(categoriesString);
+            Properties.Settings.Default.Save();
       
             Console.Clear();
 
@@ -77,10 +90,10 @@ namespace WebLancerHelper
             List<int> indices = new List<int> { };
             for (int i=0; i<array.Length; i++)
             {
-                int num = 0;
-                array[i].Trim();
-                int.TryParse(array[i], out num);
-                if(num!=0 && !indices.Contains(num-1))
+                int num;
+                array[i] = array[i].Trim();
+                if (!int.TryParse(array[i], out num)) continue;
+                if(num>0 && !indices.Contains(num-1))
                 {
                     indices.Add(num-1);
                 }

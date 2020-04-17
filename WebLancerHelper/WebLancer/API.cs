@@ -261,7 +261,7 @@ namespace WebLancerHelper.WebLancer
         public Objects.Message.MessageUnion[] GetMessages(string nickname)
         {
             Log.ProcessMessage("Пытаемся получить сообщения " + nickname);
-            if (Login == "" || Password == "") Log.ExMessage("Не назначен логин/пароль");
+            if (Login.Length==0 || Password.Length==0) Log.ExMessage("Не назначен логин/пароль");
             try
             {
                 string get = http.GetAsync(Domain+"/account/pm/?recipient=" + nickname).Result.Content.ReadAsStringAsync().Result;
@@ -314,7 +314,7 @@ namespace WebLancerHelper.WebLancer
         public bool SendMessage(string nickname, string text)
         {
             Log.ProcessMessage("Пытаемся отправить сообщение " + nickname + ", текст\n" + text);
-            if (Login == "" || Password == "") Log.ExMessage("Не назначен логин/пароль");
+            if (Login.Length == 0 || Password.Length == 0) Log.ExMessage("Не назначен логин/пароль");
             try
             {
                 string get = http.GetAsync(Domain+"/account/pm/?recipient=" + nickname).Result.Content.ReadAsStringAsync().Result;

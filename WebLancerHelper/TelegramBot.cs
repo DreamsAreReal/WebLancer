@@ -113,7 +113,7 @@ namespace WebLancerHelper
             }
         }
 
-        string StripHtmlTagsUsingRegex(string inputString)
+        static string StripHtmlTagsUsingRegex(string inputString)
         {
             return Regex.Replace(inputString, @"<br \/>|<br >|<br>|<br\/>", String.Empty);
         }
