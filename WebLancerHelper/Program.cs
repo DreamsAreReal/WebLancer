@@ -9,17 +9,32 @@ namespace WebLancerHelper
 
         private static void Main()
         {
+            // TODO: Код ревью
             // TODO: Сделать работу через прокси
             // TODO: Сделать полное управление через кнопки
             Log.SetupConsole();
-            Console.Write($"Введите логин (пример: login) [если оставить пустым, будет такое значение: {Properties.Settings.Default.Login}]: ");
-            string login = Console.ReadLine();
-            if (login.Length == 0) login = Properties.Settings.Default.Login;
-            Properties.Settings.Default.Login = login;
-            Console.Write($"Введите пароль (пример: password) [если оставить пустым, будет такое значение: {Properties.Settings.Default.Password}]: ");
-            string password = Console.ReadLine();
-            if (password.Length == 0) password = Properties.Settings.Default.Password;
-            Properties.Settings.Default.Password = password;
+            Console.Write("Нужна ли авторизация? (0 - нет, 1 - да) [Если не авторизироваться, часть функционала не будет доступна]: ");
+            var needAuthStr = Console.ReadLine().Trim();
+            if ("1" != needAuthStr && "0" != needAuthStr)
+            {
+                Log.ExMessage("Неверный ответ");
+                Console.ReadKey();
+                return;
+            }
+            bool needAuth = needAuthStr == "1" ? true : false;
+            string login = "";
+            string password = "";
+            if (needAuth)
+            {
+                Console.Write($"Введите логин (пример: login) [если оставить пустым, будет такое значение: {Properties.Settings.Default.Login}]: ");
+                login = Console.ReadLine();
+                if (login.Length == 0) login = Properties.Settings.Default.Login;
+                Properties.Settings.Default.Login = login;
+                Console.Write($"Введите пароль (пример: password) [если оставить пустым, будет такое значение: {Properties.Settings.Default.Password}]: ");
+                password = Console.ReadLine();
+                if (password.Length == 0) password = Properties.Settings.Default.Password;
+                Properties.Settings.Default.Password = password;
+            }
             Console.Write($"Введите токен телеграм бота (пример: 0000000:XXXXXXXXXXXXXXXXX) [если оставить пустым, будет такое значение: {Properties.Settings.Default.Token}]: ");
             string token = Console.ReadLine();
             if (token.Length == 0) token = Properties.Settings.Default.Token;
@@ -59,16 +74,20 @@ namespace WebLancerHelper
             Console.Clear();
 
             Log.ProcessMessage("Запуск...");
-            api.SetLogin = login;
-            api.SetPassword = password;
-            if(!api.Auth())
+
+            if(needAuth)
             {
-                Log.ExMessage("Неверный логин или пароль");
-                Console.ReadKey();
-                return;
+                api.SetLogin = login;
+                api.SetPassword = password;
+                if (!api.Auth())
+                {
+                    Log.ExMessage("Неверный логин или пароль");
+                    Console.ReadKey();
+                    return;
+                }
             }
             bot = new TelegramBot(token, id, api);
-            new WebLancer.ListenerMessage.Start(ListenerMessageSend, api);
+            if(needAuth) new WebLancer.ListenerMessage.Start(ListenerMessageSend, api);
             if (categoriesIndices.Length <= 0)
             {
                 new WebLancer.ListenerTask.Start(ListenerTaskSend, api, "/jobs/?type=project");

@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
@@ -14,15 +15,14 @@ namespace WebLancerHelper.WebLancer
         private string Password;
         private HttpClient http;
         public static readonly string Domain = "https://www.weblancer.net";
-        public API()
+        public API(string proxyString="")
         {
             UserAgent user = UserAgent.Initilization();
             string useragent = user.GetRandom();
-            if (useragent == "")
+            if (useragent.Length == 0)
             {
                 return;
             }
-
             http = new HttpClient();
             http.DefaultRequestHeaders.Add("user-agent", useragent);
         }
@@ -32,15 +32,6 @@ namespace WebLancerHelper.WebLancer
             set
             {
                 Login = value;
-                UserAgent user = UserAgent.Initilization();
-                string useragent = user.GetRandom();
-                if (useragent == "")
-                {
-                    return;
-                }
-
-                http = new HttpClient();
-                http.DefaultRequestHeaders.Add("user-agent", useragent);
             }
         }
 
@@ -49,16 +40,14 @@ namespace WebLancerHelper.WebLancer
             set
             {
                 Password = value;
-                UserAgent user = UserAgent.Initilization();
-                string useragent = user.GetRandom();
-                if (useragent == "")
-                {
-                    return;
-                }
-
-                http = new HttpClient();
-                http.DefaultRequestHeaders.Add("user-agent", useragent);
             }
+        }
+
+
+
+        public void GetIP()
+        {
+            Log.GoodMessage(http.GetAsync("https://api.ipify.org").Result.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>

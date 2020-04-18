@@ -24,7 +24,6 @@ namespace WebLancerHelper
 
         private void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
-            // todo: контактов, заданий.
             if (messageEventArgs.Message.Type != Telegram.Bot.Types.Enums.MessageType.Text)
             {
                 return;
