@@ -40,7 +40,13 @@ namespace WebLancerHelper
                 if (data.Length == 2)
                 {
                     WebLancer.Objects.Message.MessageUnion[] messages = api.GetMessages(data[1]);
-                    if (messages.Length != 0 || messages != null)
+                    if(messages == null)
+                    {
+                        SendMessage("Вы не авторизованы");
+                        return;
+                    }
+
+                    if (messages.Length!=0)
                     {
                         if (messages[0].MessageClassArray == null)
                         {

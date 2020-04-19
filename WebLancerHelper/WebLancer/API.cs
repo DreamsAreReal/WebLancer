@@ -11,12 +11,14 @@ namespace WebLancerHelper.WebLancer
 {
     public class API
     {
-        private string Login;
-        private string Password;
+        private string Login = "";
+        private string Password = "";
         private HttpClient http;
         public static readonly string Domain = "https://www.weblancer.net";
-        public API(string proxyString="")
+        bool NeedAuth;
+        public API(bool needAuth = true)
         {
+            NeedAuth = needAuth;
             UserAgent user = UserAgent.Initilization();
             string useragent = user.GetRandom();
             if (useragent.Length == 0)
@@ -44,18 +46,13 @@ namespace WebLancerHelper.WebLancer
         }
 
 
-
-        public void GetIP()
-        {
-            Log.GoodMessage(http.GetAsync("https://api.ipify.org").Result.Content.ReadAsStringAsync().Result);
-        }
-
         /// <summary>
         /// Авторизация на сервисе
         /// </summary>
         /// <returns>статус авторизации</returns>
         public bool Auth()
         {
+            if (!NeedAuth) return false;
             Log.ProcessMessage("Попытка авторизации " + Login);
             Dictionary<string, string> data = new Dictionary<string, string>
             {

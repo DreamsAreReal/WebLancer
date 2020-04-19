@@ -53,7 +53,7 @@ namespace WebLancerHelper
                 }
             }
             Properties.Settings.Default.ID = id;
-            WebLancer.API api = new WebLancer.API();
+            WebLancer.API api = new WebLancer.API(needAuth);
             if (!api.UpdateWorkCategory())
             {
                 Console.ReadKey();
